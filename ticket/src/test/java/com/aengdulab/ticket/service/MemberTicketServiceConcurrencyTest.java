@@ -12,6 +12,7 @@ import com.aengdulab.ticket.support.TimeMeasure;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,8 +50,8 @@ class MemberTicketServiceConcurrencyTest {
 
     @Test
     void 동시_티켓_발행에서_멤버당_발급_제한과_재고_감소의_정합성을_검증한다() {
-        int ticketQuantity = 10;
-        int memberCount = 5;
+        int ticketQuantity = 1000;
+        int memberCount = 500;
         Ticket ticket = createTicket("목성행", ticketQuantity);
         List<Member> members = createMembers(memberCount);
 
@@ -61,7 +62,7 @@ class MemberTicketServiceConcurrencyTest {
             }
         });
 
-        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
+        assertThat(getTicketForUpdateQuantity(ticket)).isEqualTo(0);
         for (Member member : members) {
             assertThat(getMemberTicketCount(member)).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
@@ -83,8 +84,8 @@ class MemberTicketServiceConcurrencyTest {
             }
         });
 
-        assertThat(getTicketQuantity(jupiterTicket)).isGreaterThanOrEqualTo(0);
-        assertThat(getTicketQuantity(marsTicket)).isGreaterThanOrEqualTo(0);
+        assertThat(getTicketForUpdateQuantity(jupiterTicket)).isGreaterThanOrEqualTo(0);
+        assertThat(getTicketForUpdateQuantity(marsTicket)).isGreaterThanOrEqualTo(0);
         for (Member member : members) {
             assertThat(getMemberTicketCount(member)).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
@@ -104,7 +105,7 @@ class MemberTicketServiceConcurrencyTest {
             }
         });
 
-        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
+        assertThat(getTicketForUpdateQuantity(ticket)).isEqualTo(0);
         for (Member member : members) {
             assertThat(getMemberTicketCount(member)).isLessThanOrEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
@@ -127,7 +128,12 @@ class MemberTicketServiceConcurrencyTest {
                 });
             }
         }
-
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            log.error("Error occurred while waiting termination", e);
+        }
         log.info("성공한 요청 수 : {}", succeedRequestCount.get());
         log.info("실패한 요청 수 : {}", failRequestCount.get());
     }
@@ -137,7 +143,7 @@ class MemberTicketServiceConcurrencyTest {
         return tickets[ticketOrder];
     }
 
-    private long getTicketQuantity(Ticket ticket) {
+    private long getTicketForUpdateQuantity(Ticket ticket) {
         return ticketRepository.findById(ticket.getId()).orElseThrow().getQuantity();
     }
 
