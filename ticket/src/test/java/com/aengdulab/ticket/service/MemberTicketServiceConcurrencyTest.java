@@ -61,7 +61,7 @@ class MemberTicketServiceConcurrencyTest {
             }
         });
 
-        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
+        assertThat(getTicketQuantity(ticket)).isZero();
         for (Member member : members) {
             assertThat(getMemberTicketCount(member)).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
@@ -83,8 +83,8 @@ class MemberTicketServiceConcurrencyTest {
             }
         });
 
-        assertThat(getTicketQuantity(jupiterTicket)).isGreaterThanOrEqualTo(0);
-        assertThat(getTicketQuantity(marsTicket)).isGreaterThanOrEqualTo(0);
+        assertThat(getTicketQuantity(jupiterTicket)).isNotNegative();
+        assertThat(getTicketQuantity(marsTicket)).isNotNegative();
         for (Member member : members) {
             assertThat(getMemberTicketCount(member)).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
@@ -104,7 +104,7 @@ class MemberTicketServiceConcurrencyTest {
             }
         });
 
-        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
+        assertThat(getTicketQuantity(ticket)).isZero();
         for (Member member : members) {
             assertThat(getMemberTicketCount(member)).isLessThanOrEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
