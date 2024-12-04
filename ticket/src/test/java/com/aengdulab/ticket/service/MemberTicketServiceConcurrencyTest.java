@@ -49,8 +49,8 @@ class MemberTicketServiceConcurrencyTest {
 
     @Test
     void 동시_티켓_발행에서_멤버당_발급_제한과_재고_감소의_정합성을_검증한다() {
-        int ticketQuantity = 10;
-        int memberCount = 5;
+        int ticketQuantity = 1000;
+        int memberCount = 500;
         Ticket ticket = createTicket("목성행", ticketQuantity);
         List<Member> members = createMembers(memberCount);
 
@@ -61,10 +61,10 @@ class MemberTicketServiceConcurrencyTest {
             }
         });
 
-        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
         for (Member member : members) {
             assertThat(getMemberTicketCount(member)).isEqualTo(MemberTicket.MEMBER_TICKET_COUNT_MAX);
         }
+        assertThat(getTicketQuantity(ticket)).isEqualTo(0);
     }
 
     @Test
