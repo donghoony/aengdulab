@@ -20,7 +20,7 @@ public class MemberTicketService {
     private final MemberTicketRepository memberTicketRepository;
 
     @Transactional
-    public void issue(Long memberId, Long ticketId) {
+    public void issue(long memberId, long ticketId) {
         Member member = getMember(memberId);
         Ticket ticket = getTicket(ticketId);
         validateIssuable(member, ticket);
@@ -28,12 +28,12 @@ public class MemberTicketService {
         ticket.decrementQuantity();
     }
 
-    private Member getMember(Long memberId) {
+    private Member getMember(long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("멤버가 존재하지 않습니다."));
     }
 
-    private Ticket getTicket(Long ticketId) {
+    private Ticket getTicket(long ticketId) {
         return ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("티켓이 존재하지 않습니다."));
     }
