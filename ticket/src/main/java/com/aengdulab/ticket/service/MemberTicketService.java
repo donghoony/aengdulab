@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberTicketService {
 
+    private static final int MEMBER_TICKET_MAX_COUNT = 2;
+
     private final MemberRepository memberRepository;
     private final TicketRepository ticketRepository;
     private final MemberTicketRepository memberTicketRepository;
@@ -40,7 +42,7 @@ public class MemberTicketService {
 
     private void validateIssuable(Member member) {
         int issuedMemberTicketCount = memberTicketRepository.countByMember(member);
-        if (issuedMemberTicketCount >= MemberTicket.MEMBER_TICKET_COUNT_MAX) {
+        if (issuedMemberTicketCount >= MEMBER_TICKET_MAX_COUNT) {
             throw new IllegalArgumentException("계정당 구매할 수 있는 티켓 수량을 넘었습니다.");
         }
     }
